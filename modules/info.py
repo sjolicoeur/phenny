@@ -17,18 +17,44 @@ def doc(phenny, input):
       if phenny.doc[name][1]: 
          phenny.say('e.g. ' + phenny.doc[name][1])
 doc.rule = ('$nick', '(?i)(?:help|doc) +([A-Za-z]+)(?:\?+)?$')
+#doc.commands = ["doc"]
 doc.example = '$nickname: doc tell?'
 doc.priority = 'low'
 
 def commands(phenny, input): 
    # This function only works in private message
    if input.sender.startswith('#'): return
+   print "\t\t", input, type(phenny.doc)
+   #print dir(phenny), dir(phenny.doc), ', '.join(sorted(phenny.doc.iterkeys())), phenny.doc
    names = ', '.join(sorted(phenny.doc.iterkeys()))
-   phenny.say('Commands I recognise: ' + names + '.')
-   phenny.say(("For help, do '%s: help example?' where example is the " + 
-               "name of the command you want help for.") % phenny.nick)
+   #phenny.say('Commands I recognise: ' + names + '.')
+   #phenny.say(("For help, do '%s: help example?' where example is the " + 
+   #            "name of the command you want help for.") % phenny.nick)
+   phenny.say("Here we go again! Sigh!")
+   msg = ""
+   for cmd, doc in phenny.doc.items() : 
+      phenny.say("%s  \t\t[ %s ]" % (cmd, doc[0]))
+      if doc[1] :
+         phenny.say("\t\t\tFor example : \t'%s'" % doc[1])
+      phenny.say("\n")
 commands.commands = ['commands']
 commands.priority = 'low'
+
+def apropos(phenny, input): 
+   # This function only works in private message
+   if input.sender.startswith('#'): return
+   #print "\t\t", input, type(phenny.doc)
+   #print dir(phenny), dir(phenny.doc), ', '.join(sorted(phenny.doc.iterkeys())), phenny.doc
+   names = ', '.join(sorted(phenny.doc.iterkeys()))
+   if len(input.split(" ")) == 2 :
+      apropos_key = input.split(" ")[1] 
+      prefix = phenny.config.prefix.replace("\\","")
+      apropos = ["%s%s" % (prefix, found) for found in phenny.doc.keys() if apropos_key in found ]
+      phenny.say("Hmmm... try one of these commands : %s " % apropos)
+   else :
+      phenny.say("About... What!?")
+apropos.commands = ['apropos']
+apropos.priority = 'low'
 
 def help(phenny, input): 
    response = (
